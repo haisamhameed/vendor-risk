@@ -1,0 +1,78 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: vendor_risk
+    volumes:
+      - .:/var/www
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - vendor_risk_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: vendor_risk_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - vendor_risk_network
+
+  mysql:
+    image: mysql:8.0
+    container_name: vendor_risk_mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: ${DB_DATABASE}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - vendor_risk_network
+
+  redis:
+    image: redis:alpine
+    container_name: vendor_risk_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - vendor_risk_network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: vendor_risk_mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - vendor_risk_network
+
+  queue:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: vendor_risk_queue
+    command: php artisan queue:work --verbose --tries=3 --timeout=90
+    volumes:
+      - .:/var/www
+    depends_on:
+      - app
+      - redis
+    networks:
+      - vendor_risk_network
+
+networks:
+  vendor_risk_network:
+
+volumes:
+  mysql_data:
