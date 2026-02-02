@@ -1,47 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| TEMP DEMO ROUTES (UI ONLY)
-|--------------------------------------------------------------------------
-| No auth, no DB, no controllers
-| Just to preview layouts & screens
-*/
+use App\Http\Controllers\VendorController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
-    return view('landing');
-})->name('landing');
+    return redirect()->route('login');
+});
+// Route::middleware(['auth'])->group(function () {
 
-Route::get('/dashboard', function () {
-    return view('pages.dashboard');
-})->name('dashboard');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-/* Vendors */
-Route::get('/vendors', function () {
-    return view('pages.vendors.index');
-})->name('vendors.index');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/vendors', [VendorController::class, 'index']);
+    Route::get('/vendors/create', [VendorController::class, 'create']);
+    Route::get('/vendors/{vendor}', [VendorController::class, 'show']);
 
-Route::get('/vendors/create', function () {
-    return view('pages.vendors.create');
-})->name('vendors.create');
-
-Route::get('/vendors/{id}', function () {
-    return view('pages.vendors.show');
-})->name('vendors.show');
-
-/* Risk */
-Route::get('/risk/assessment', function () {
-    return view('pages.risk.assessment');
-})->name('risk.assessment');
-
-/* Auth (Mock) */
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
-
-Route::get('/register', function () {
-    return view('auth.signup');
-})->name('register');
-
+    Route::get('/risk', [VendorController::class, 'index']);
+// });
+require __DIR__.'/auth.php';
