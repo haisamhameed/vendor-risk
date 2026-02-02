@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
-class VendorController extends Controller
+class DocumentController extends Controller
 {
     /**
      * Display the user's profile form.
      */
     public function index(Request $request): View
     {
-        return view('pages.vendors.index');
+        return view('pages.documents.index');
     }
 
         /**
@@ -24,7 +24,7 @@ class VendorController extends Controller
      */
     public function show(Request $request): View
     {
-        return view('pages.vendors.show');
+        return view('pages.documents.show');
     }
 
             /**
@@ -70,9 +70,5 @@ class VendorController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
-    }
-
-    public function history() {
-        return view('pages.vendors.history');
     }
 }
